@@ -53,7 +53,14 @@ websocketServer.listen(WS_PORT, () => console.log( // eslint-disable-line no-con
 ));
 
 // eslint-disable-next-line
-new SubscriptionServer({ subscriptionManager }, {
+new SubscriptionServer({
+  onConnect: async (connectionParams) => {
+    if (connectionParams.randomId) {
+      console.log('randomId =>', connectionParams.randomId);
+    }
+  },
+  subscriptionManager,
+}, {
   server: websocketServer,
   path: '/',
 });

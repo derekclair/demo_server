@@ -4,14 +4,14 @@ import { find, filter } from 'lodash';
 import { pubsub } from './subscriptions';
 
 const authors = [
-  { id: 1, firstName: 'Tom', lastName: 'Coleman' },
-  { id: 2, firstName: 'Sashko', lastName: 'Stubailo' },
+  { id: 1, firstName: 'Derek', lastName: 'Clair' },
+  { id: 2, firstName: 'Jeffrey', lastName: 'Lebowski' },
 ];
 
 const posts = [
-  { id: 1, authorId: 1, title: 'Introduction to GraphQL', votes: 2 },
-  { id: 2, authorId: 2, title: 'GraphQL Rocks', votes: 3 },
-  { id: 3, authorId: 2, title: 'Advanced GraphQL', votes: 1 },
+  { id: 1, authorId: 1, comment: 'Apollo + GraphQL, easy peasy!', votes: 2 },
+  { id: 2, authorId: 1, comment: 'GraphQL Rocks', votes: 3 },
+  { id: 3, authorId: 2, comment: 'The dude abides', votes: 1 },
 ];
 
 export default {
@@ -33,11 +33,29 @@ export default {
       pubsub.publish('postUpvoted', post);
       return post;
     },
+    newAuthor(_, { firstName, lastName }) {
+      const newAuthor = {
+        id: authors.length + 1,
+        firstName,
+        lastName,
+      };
+      authors.push(newAuthor);
+      return newAuthor;
+    },
+    newPost(_, { post }) {
+      const newPost = {
+        id: posts.length + 1,
+        ...post,
+        votes: 0,
+      };
+      posts.push(newPost);
+      pubsub.publish('newPost', newPost);
+      return newPost;
+    },
   },
   Subscription: {
-    postUpvoted(post) {
-      return post;
-    },
+    postUpvoted(post) { return post; },
+    newPost(post) { return post; },
   },
   Author: {
     posts(author) {
